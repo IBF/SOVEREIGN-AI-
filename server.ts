@@ -14,52 +14,30 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
-  // Global Logger
-  app.use((req, res, next) => {
-    console.log(`>>> [${new Date().toISOString()}] ${req.method} ${req.url}`);
-    next();
+  // 1. API ROUTES (Must be defined before Vite/Static middleware)
+  
+  // Test Ping
+  app.get("/api/ping", (req, res) => {
+    res.json({ message: "pong", timestamp: new Date().toISOString() });
   });
 
-  // Health check
-  app.get("/api/health", (req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
-  // API Route for Demo Request - Using v1 prefix for clarity
-  app.all("/api/v1/demo", (req, res) => {
-    if (req.method !== "POST") {
-      return res.status(405).json({ success: false, message: "Method Not Allowed" });
-    }
-
-    try {
-      const { name, email, company, industry, message } = req.body;
-      
-      console.log("--- NEW DEMO REQUEST RECEIVED (v1) ---");
-      console.log(`To: Giuseppe.Santaguida@adexec.com`);
-      console.log(`From: ${name} <${email}>`);
-      console.log("--------------------------------------");
-
-      res.status(200).json({ 
-        success: true, 
-        message: "Request received for Giuseppe.Santaguida@adexec.com" 
-      });
-    } catch (error: any) {
-      console.error("API Route Error:", error);
-      res.status(500).json({ success: false, message: error.message });
-    }
-  });
-
-  // 404 Debugger for API
-  app.use("/api/*", (req, res) => {
-    console.warn(`!!! API 404: ${req.method} ${req.originalUrl}`);
-    res.status(404).json({ 
-      success: false, 
-      message: `Endpoint ${req.originalUrl} not found on this server`,
-      validEndpoints: ["/api/health", "/api/v1/demo"]
+  // Main Demo Submission
+  app.post("/api/submit-demo", (req, res) => {
+    const { name, email, company, industry, message } = req.body;
+    
+    console.log(">>> [SERVER] NEW DEMO REQUEST RECEIVED");
+    console.log(`>>> To: Giuseppe.Santaguida@adexec.com`);
+    console.log(`>>> From: ${name} (${email})`);
+    console.log(`>>> Company: ${company} | Industry: ${industry}`);
+    console.log(`>>> Message: ${message}`);
+    
+    return res.status(200).json({ 
+      success: true, 
+      message: "Request successfully logged for Giuseppe.Santaguida@adexec.com" 
     });
   });
 
-  // Vite middleware for development
+  // 2. VITE / STATIC MIDDLEWARE
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
       server: { middlewareMode: true },

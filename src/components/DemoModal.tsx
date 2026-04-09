@@ -22,7 +22,7 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     setStatus("submitting");
 
     try {
-      const endpoint = "/api/v1/demo";
+      const endpoint = "/api/submit-demo";
       console.log(`Attempting POST to: ${endpoint}`);
       
       const response = await fetch(endpoint, {
