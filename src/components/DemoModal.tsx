@@ -22,12 +22,17 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     setStatus("submitting");
 
     try {
-      console.log("Sending demo request...", formData);
+      console.log("Initiating fetch to /api/demo-request...");
       const response = await fetch("/api/demo-request", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
         body: JSON.stringify(formData)
       });
+
+      console.log("Response status:", response.status);
 
       if (response.ok) {
         const result = await response.json();
@@ -39,13 +44,13 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
           setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
         }, 3000);
       } else {
-        const errorText = await response.text();
-        console.error("Request failed with status:", response.status, errorText);
-        throw new Error(`Failed to send request: ${response.status}`);
+        const errorData = await response.json().catch(() => ({ message: "Unknown server error" }));
+        console.error("Request failed:", response.status, errorData);
+        throw new Error(`Server returned ${response.status}: ${errorData.message || 'No details'}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Detailed Error:", error);
-      alert("SOVEREIGN AI SAY THAT SOMETHING WENT WRONG. Please verify your connection and try again.");
+      alert(`SOVEREIGN AI SAY THAT SOMETHING WENT WRONG: ${error.message}`);
       setStatus("idle");
     }
   };

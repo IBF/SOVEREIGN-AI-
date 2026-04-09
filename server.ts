@@ -21,25 +21,26 @@ async function startServer() {
 
   // API Route for Demo Request
   app.post("/api/demo-request", (req, res) => {
-    const { name, email, company, industry, message } = req.body;
-    
-    console.log("--- NEW DEMO REQUEST ---");
-    console.log(`To: Giuseppe.Santaguida@adexec.com`);
-    console.log(`From: ${name} <${email}>`);
-    console.log(`Company: ${company}`);
-    console.log(`Industry: ${industry}`);
-    console.log(`Message: ${message}`);
-    console.log("-------------------------");
+    try {
+      const { name, email, company, industry, message } = req.body;
+      
+      console.log("--- NEW DEMO REQUEST RECEIVED ---");
+      console.log(`Timestamp: ${new Date().toISOString()}`);
+      console.log(`To: Giuseppe.Santaguida@adexec.com`);
+      console.log(`From: ${name} <${email}>`);
+      console.log(`Company: ${company}`);
+      console.log(`Industry: ${industry}`);
+      console.log(`Message: ${message}`);
+      console.log("---------------------------------");
 
-    // In a real production app, you would use a service like Resend, SendGrid, or Nodemailer here.
-    // Example (pseudo-code):
-    // await emailService.send({
-    //   to: "Giuseppe.Santaguida@adexec.com",
-    //   subject: `New Demo Request from ${name}`,
-    //   text: `Name: ${name}\nEmail: ${email}\nCompany: ${company}\nIndustry: ${industry}\nMessage: ${message}`
-    // });
-
-    res.status(200).json({ success: true, message: "Request received" });
+      res.status(200).json({ 
+        success: true, 
+        message: "Request received and logged for Giuseppe.Santaguida@adexec.com" 
+      });
+    } catch (error: any) {
+      console.error("API Route Error:", error);
+      res.status(500).json({ success: false, message: error.message });
+    }
   });
 
   // Vite middleware for development
