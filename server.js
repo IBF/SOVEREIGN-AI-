@@ -21,7 +21,7 @@ async function startServer() {
   // --- CRITICAL API ROUTES ---
   
   // Debug Ping
-  app.get("/api/ping", (req, res) => {
+  app.get("/ping", (req, res) => {
     console.log(">>> [API] Ping received");
     res.json({ status: "alive", time: new Date().toISOString(), env: process.env.NODE_ENV });
   });
@@ -31,11 +31,13 @@ async function startServer() {
     console.log(`>>> [API] Submission received | Method: ${req.method} | Path: ${req.url}`);
     
     try {
-      const { name, email, company } = req.body;
+      const { name, email, company, industry, message } = req.body;
       
       console.log(">>> [SUCCESS] DEMO REQUEST CAPTURED");
       console.log(`>>> To: Giuseppe.Santaguida@adexec.com`);
       console.log(`>>> From: ${name} (${email})`);
+      console.log(`>>> Company: ${company} | Industry: ${industry}`);
+      console.log(`>>> Message: ${message}`);
       console.log("--------------------------------------");
 
       return res.status(200).json({ 
@@ -55,6 +57,7 @@ async function startServer() {
   // GET handlers for debugging
   app.get("/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
   app.get("/api/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
+  app.get("/api/ping", (req, res) => res.json({ status: "alive" }));
 
   // --- FRONTEND SERVING ---
 

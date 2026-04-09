@@ -21,9 +21,14 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
   const testConnection = async () => {
     setServerStatus("unknown");
     try {
-      const res = await fetch("/api/ping");
+      // Try root ping first
+      const res = await fetch("/ping");
       if (res.ok) setServerStatus("online");
-      else setServerStatus("offline");
+      else {
+        const res2 = await fetch("/api/ping");
+        if (res2.ok) setServerStatus("online");
+        else setServerStatus("offline");
+      }
     } catch (e) {
       setServerStatus("offline");
     }
@@ -41,7 +46,8 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
 
     try {
       // Try multiple endpoints in sequence if one fails
-      const endpoints = ["/submit-demo", "/api/submit-demo"];
+      // We try the root one first as it's most likely to bypass proxy filters
+      const endpoints = ["/submit-demo", "/api/submit-demo", "/api/v1/submit-demo"];
       let lastError = null;
 
       for (const endpoint of endpoints) {
