@@ -158,10 +158,10 @@ export default function PremiumVideo() {
               animate={{ width: "100px" }}
               className="h-1 bg-electric-blue mb-8"
             />
-            <h2 className="text-4xl md:text-6xl font-bold text-white mb-6 tracking-tighter">
+            <h2 className="text-2xl md:text-4xl lg:text-6xl font-bold text-white mb-4 md:mb-6 tracking-tighter leading-tight">
               {explanationSlides[currentSlide].text}
             </h2>
-            <p className="text-electric-blue-light text-xl md:text-2xl font-light tracking-wide max-w-2xl">
+            <p className="text-electric-blue-light text-sm md:text-xl lg:text-2xl font-light tracking-wide max-w-2xl px-4">
               {explanationSlides[currentSlide].sub}
             </p>
           </motion.div>

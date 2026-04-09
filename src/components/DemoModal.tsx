@@ -22,6 +22,7 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     setStatus("submitting");
 
     try {
+      console.log("Sending demo request...", formData);
       const response = await fetch("/api/demo-request", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -29,6 +30,8 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
       });
 
       if (response.ok) {
+        const result = await response.json();
+        console.log("Request successful:", result);
         setStatus("success");
         setTimeout(() => {
           onClose();
@@ -36,11 +39,13 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
           setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
         }, 3000);
       } else {
-        throw new Error("Failed to send request");
+        const errorText = await response.text();
+        console.error("Request failed with status:", response.status, errorText);
+        throw new Error(`Failed to send request: ${response.status}`);
       }
     } catch (error) {
-      console.error(error);
-      alert("Something went wrong. Please try again.");
+      console.error("Detailed Error:", error);
+      alert("SOVEREIGN AI SAY THAT SOMETHING WENT WRONG. Please verify your connection and try again.");
       setStatus("idle");
     }
   };
