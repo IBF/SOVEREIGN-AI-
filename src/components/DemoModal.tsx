@@ -23,7 +23,8 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
 
     try {
       console.log("Initiating fetch to /api/demo-request...");
-      const response = await fetch("/api/demo-request", {
+      // Use absolute URL to ensure it hits the correct backend port in this environment
+      const response = await fetch(`${window.location.origin}/api/demo-request`, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",

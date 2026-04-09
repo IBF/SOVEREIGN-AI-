@@ -43,6 +43,16 @@ async function startServer() {
     }
   });
 
+  // 404 Debugger for API
+  app.use("/api/*", (req, res) => {
+    console.warn(`404 at ${req.originalUrl} [${req.method}]`);
+    res.status(404).json({ 
+      success: false, 
+      message: `API Route ${req.originalUrl} not found`,
+      availableRoutes: ["/api/health", "/api/demo-request"]
+    });
+  });
+
   // Vite middleware for development
   if (process.env.NODE_ENV !== "production") {
     const vite = await createViteServer({
