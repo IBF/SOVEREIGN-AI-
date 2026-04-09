@@ -45,48 +45,31 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     setStatus("submitting");
 
     try {
-      // Try multiple endpoints in sequence if one fails
-      // We try the root one first as it's most likely to bypass proxy filters
-      const endpoints = ["/submit-demo", "/api/submit-demo", "/api/v1/submit-demo"];
-      let lastError = null;
+      const response = await fetch("/submit-demo", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify(formData)
+      });
 
-      for (const endpoint of endpoints) {
-        try {
-          console.log(`Attempting submission to: ${endpoint}`);
-          const response = await fetch(endpoint, {
-            method: "POST",
-            headers: { 
-              "Content-Type": "application/json",
-              "Accept": "application/json"
-            },
-            body: JSON.stringify(formData)
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log("Success:", result);
-            setStatus("success");
-            setTimeout(() => {
-              onClose();
-              setStatus("idle");
-              setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
-            }, 3000);
-            return; // Exit on success
-          } else {
-            const text = await response.text();
-            console.warn(`Endpoint ${endpoint} failed with status ${response.status}: ${text}`);
-            lastError = `[${endpoint}] Status ${response.status}: ${text}`;
-          }
-        } catch (err: any) {
-          console.error(`Fetch error for ${endpoint}:`, err);
-          lastError = err.message;
-        }
+      if (response.ok) {
+        const result = await response.json();
+        console.log("Success:", result);
+        setStatus("success");
+        setTimeout(() => {
+          onClose();
+          setStatus("idle");
+          setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
+        }, 3000);
+      } else {
+        const text = await response.text();
+        throw new Error(`Status ${response.status}: ${text}`);
       }
-      
-      throw new Error(lastError || "All endpoints failed");
     } catch (error: any) {
-      console.error("Final Submission Error:", error);
-      alert(`SOVEREIGN AI COMMUNICATION ERROR: ${error.message}`);
+      console.error("Submission Error:", error);
+      alert(`COMMUNICATION ERROR: ${error.message}`);
       setStatus("idle");
     }
   };
@@ -109,6 +92,16 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="relative w-full max-w-lg glass-dark rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden"
           >
+            <div className="absolute top-6 left-8 flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${
+                serverStatus === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 
+                serverStatus === 'offline' ? 'bg-red-500' : 'bg-slate-500 animate-pulse'
+              }`} />
+              <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
+                System: {serverStatus}
+              </span>
+            </div>
+
             <button 
               onClick={onClose}
               className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors"

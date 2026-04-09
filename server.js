@@ -1,92 +1,49 @@
 import express from "express";
 import cors from "cors";
-import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
 import fs from "fs";
 
-console.log(">>> [BOOT] Sovereign AI Server Initializing...");
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-async function startServer() {
-  const app = express();
-  const PORT = 3000;
+const app = express();
+const PORT = 3000;
 
-  app.use(cors());
-  app.use(express.json());
-  app.use(express.urlencoded({ extended: true }));
+app.use(cors());
+app.use(express.json());
 
-  // --- CRITICAL API ROUTES ---
-  
-  // Debug Ping
-  app.get("/ping", (req, res) => {
-    console.log(">>> [API] Ping received");
-    res.json({ status: "alive", time: new Date().toISOString(), env: process.env.NODE_ENV });
+// --- API ROUTES ---
+
+app.get("/ping", (req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
+
+app.post("/submit-demo", (req, res) => {
+  const { name, email, company } = req.body;
+  console.log(`>>> [DEMO] Request from ${name} (${email}) @ ${company}`);
+  res.json({ success: true, message: "Logged for Giuseppe.Santaguida@adexec.com" });
+});
+
+// --- STATIC FILES ---
+
+const distPath = path.join(process.cwd(), "dist");
+
+if (fs.existsSync(distPath)) {
+  app.use(express.static(distPath));
+  // SPA Fallback - ONLY for GET requests that are not API calls
+  app.get("*", (req, res) => {
+    if (req.url.startsWith("/api") || req.url === "/submit-demo" || req.url === "/ping") {
+      return res.status(404).json({ error: "API Route Not Found" });
+    }
+    res.sendFile(path.join(distPath, "index.html"));
   });
-
-  // Main Demo Submission - Multiple paths for maximum compatibility
-  const handleSubmission = (req, res) => {
-    console.log(`>>> [API] Submission received | Method: ${req.method} | Path: ${req.url}`);
-    
-    try {
-      const { name, email, company, industry, message } = req.body;
-      
-      console.log(">>> [SUCCESS] DEMO REQUEST CAPTURED");
-      console.log(`>>> To: Giuseppe.Santaguida@adexec.com`);
-      console.log(`>>> From: ${name} (${email})`);
-      console.log(`>>> Company: ${company} | Industry: ${industry}`);
-      console.log(`>>> Message: ${message}`);
-      console.log("--------------------------------------");
-
-      return res.status(200).json({ 
-        success: true, 
-        message: "Request successfully received for Giuseppe.Santaguida@adexec.com" 
-      });
-    } catch (err) {
-      console.error(">>> [ERROR] Processing submission:", err);
-      return res.status(500).json({ success: false, message: "Internal Server Error" });
-    }
-  };
-
-  app.post("/submit-demo", handleSubmission);
-  app.post("/api/submit-demo", handleSubmission);
-  app.post("/api/v1/submit-demo", handleSubmission);
-
-  // GET handlers for debugging
-  app.get("/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
-  app.get("/api/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
-  app.get("/api/ping", (req, res) => res.json({ status: "alive" }));
-
-  // --- FRONTEND SERVING ---
-
-  if (process.env.NODE_ENV !== "production") {
-    console.log(">>> [MODE] Development (Vite)");
-    const vite = await createViteServer({
-      server: { middlewareMode: true },
-      appType: "spa",
-    });
-    app.use(vite.middlewares);
-  } else {
-    console.log(">>> [MODE] Production (Static)");
-    const distPath = path.join(process.cwd(), "dist");
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(distPath, "index.html"));
-      });
-    } else {
-      console.warn(">>> [WARN] 'dist' folder missing. Serving fallback.");
-      app.get("*", (req, res) => res.status(500).send("Build missing."));
-    }
-  }
-
-  app.listen(PORT, "0.0.0.0", () => {
-    console.log(`>>> [READY] Sovereign AI Server listening on port ${PORT}`);
+} else {
+  app.get("*", (req, res) => {
+    res.status(500).send("Build the app first with 'npm run build'");
   });
 }
 
-startServer().catch(err => {
-  console.error(">>> [FATAL] Server failed to start:", err);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`Server running on port ${PORT}`);
 });
