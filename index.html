@@ -1,13 +1,172 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>My Google AI Studio App</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ 
+  <!-- Professional Title & Description -->
+  <title>Sovereign AI • Self-Hosted Intelligence Platform</title>
+  <meta name="description" content="Fully private, air-gapped AI for Finance, Healthcare and Legal. No token fees. Complete data sovereignty. Runs 100% on your infrastructure.">
+
+  <!-- Open Graph / LinkedIn, Facebook, Twitter Preview -->
+  <meta property="og:title" content="Sovereign AI • AI that stays where your data lives">
+  <meta property="og:description" content="Self-hosted AI platform with zero token fees, full data sovereignty and built-in compliance for regulated industries. No cloud. No compromises.">
+  <meta property="og:image" content="https://sovereign-ai-ivory.vercel.app/og-image.jpg"> <!-- Upload a nice preview image later -->
+  <meta property="og:url" content="https://sovereign-ai-ivory.vercel.app">
+  <meta property="og:type" content="website">
+ 
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="Sovereign AI • Self-Hosted Intelligence">
+  <meta name="twitter:description" content="Private AI with no token fees and complete data control.">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+ 
+  <style>
+    body { font-family: 'Inter', system-ui, sans-serif; }
+    .hero { background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 100%); }
+    .card { transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); }
+    .card:hover { transform: translateY(-10px); box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25); }
+  </style>
+</head>
+<body class="bg-zinc-950 text-zinc-200">
+
+  <!-- Navbar -->
+  <nav class="fixed top-0 w-full bg-zinc-950/90 backdrop-blur-md border-b border-zinc-800 z-50">
+    <div class="max-w-7xl mx-auto px-6 py-5 flex justify-between items-center">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 bg-blue-600 rounded-2xl flex items-center justify-center text-white font-bold text-xl">S</div>
+        <span class="text-2xl font-semibold">Sovereign AI</span>
+      </div>
+      <div class="flex gap-8 text-sm font-medium">
+        <a href="#about" class="hover:text-blue-400 transition">About</a>
+        <a href="#industries" class="hover:text-blue-400 transition">Industries</a>
+        <a href="#pricing" class="hover:text-blue-400 transition">Pricing</a>
+        <a href="#demo" class="hover:text-blue-400 transition">Demo</a>
+      </div>
+      <a href="#contact" class="bg-blue-600 hover:bg-blue-700 px-6 py-2.5 rounded-2xl text-sm font-medium transition">Book Private Demo</a>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero min-h-screen flex items-center pt-20">
+    <div class="max-w-7xl mx-auto px-6 text-center">
+      <h1 class="text-6xl md:text-7xl font-bold leading-tight mb-6">
+        AI that stays<br>where your data lives.
+      </h1>
+      <p class="text-xl text-zinc-400 max-w-2xl mx-auto mb-12">
+        Fully self-hosted AI platform for Finance, Healthcare, and Legal.<br>
+        <span class="text-blue-400 font-medium">Zero token fees.</span> Complete data sovereignty. Predictable annual pricing.
+      </p>
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <a href="#demo" class="bg-white text-black px-10 py-4 rounded-2xl font-semibold text-lg hover:scale-105 transition">Try Live Demo</a>
+        <a href="#contact" class="border border-zinc-600 hover:border-white px-10 py-4 rounded-2xl font-semibold text-lg transition">Book Private Demo</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section id="about" class="py-24 bg-zinc-900">
+    <div class="max-w-4xl mx-auto px-6 text-center">
+      <h2 class="text-4xl font-semibold mb-6">About Sovereign AI</h2>
+      <p class="text-xl text-zinc-400 leading-relaxed max-w-3xl mx-auto">
+        Sovereign AI is a premium self-hosted, air-gapped intelligence platform built for organizations that demand complete data sovereignty.
+        Powered by Gemma and optimized for Finance, Healthcare, and Legal teams, it delivers professional-grade AI assistance while ensuring zero data leaves your secure environment.
+      </p>
+    </div>
+  </section>
+
+  <!-- Industries -->
+  <section id="industries" class="py-24 bg-black">
+    <div class="max-w-6xl mx-auto px-6">
+      <h2 class="text-4xl font-semibold text-center mb-16">Built for Regulated Industries</h2>
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="card bg-zinc-950 border border-zinc-800 rounded-3xl p-10">
+          <div class="text-6xl mb-6">⚖️</div>
+          <h3 class="text-3xl font-semibold mb-4">Legal</h3>
+          <p class="text-zinc-400">Contract review, risk flagging, regulatory gap analysis, and compliance recommendations.</p>
+        </div>
+        <div class="card bg-zinc-950 border border-zinc-800 rounded-3xl p-10">
+          <div class="text-6xl mb-6">📊</div>
+          <h3 class="text-3xl font-semibold mb-4">Finance</h3>
+          <p class="text-zinc-400">KYC/AML risk assessment, investment analysis, and SOX/PCI-DSS compliance.</p>
+        </div>
+        <div class="card bg-zinc-950 border border-zinc-800 rounded-3xl p-10">
+          <div class="text-6xl mb-6">🏥</div>
+          <h3 class="text-3xl font-semibold mb-4">Healthcare</h3>
+          <p class="text-zinc-400">Medical coding, HIPAA compliance, and clinical documentation review.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Pricing -->
+  <section id="pricing" class="py-24 bg-zinc-900">
+    <div class="max-w-6xl mx-auto px-6">
+      <div class="text-center mb-16">
+        <h2 class="text-4xl font-semibold mb-4">Simple, Predictable Pricing</h2>
+        <p class="text-zinc-400">Annual licensing. No per-token surprises. Full ownership.</p>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-8">
+        <div class="bg-zinc-950 border border-zinc-700 rounded-3xl p-10">
+          <h3 class="text-2xl font-semibold mb-2">Starter</h3>
+          <div class="text-5xl font-bold mb-6">$12,000<span class="text-sm font-normal text-zinc-400">/year</span></div>
+          <ul class="space-y-4 text-sm mb-10">
+            <li class="flex items-center gap-2">✓ One vertical</li>
+            <li class="flex items-center gap-2">✓ Up to 5 users</li>
+            <li class="flex items-center gap-2">✓ Basic RAG & agents</li>
+            <li class="flex items-center gap-2">✓ Email support</li>
+          </ul>
+          <a href="#contact" class="block text-center border border-zinc-600 hover:border-white py-3 rounded-2xl text-sm font-medium transition">Get Started</a>
+        </div>
+
+        <div class="bg-zinc-950 border border-blue-500 rounded-3xl p-10 relative">
+          <div class="absolute -top-4 left-1/2 -translate-x-1/2 bg-blue-600 text-white text-xs font-bold px-6 py-1 rounded-full">MOST POPULAR</div>
+          <h3 class="text-2xl font-semibold mb-2">Professional</h3>
+          <div class="text-5xl font-bold mb-6">$35,000<span class="text-sm font-normal text-zinc-400">/year</span></div>
+          <ul class="space-y-4 text-sm mb-10">
+            <li class="flex items-center gap-2">✓ All three verticals</li>
+            <li class="flex items-center gap-2">✓ Up to 20 users</li>
+            <li class="flex items-center gap-2">✓ Full agents & RAG</li>
+            <li class="flex items-center gap-2">✓ Priority support</li>
+            <li class="flex items-center gap-2">✓ Quarterly updates</li>
+          </ul>
+          <a href="#contact" class="block text-center bg-blue-600 hover:bg-blue-700 py-3 rounded-2xl text-sm font-medium transition">Get Started</a>
+        </div>
+
+        <div class="bg-zinc-950 border border-zinc-700 rounded-3xl p-10">
+          <h3 class="text-2xl font-semibold mb-2">Enterprise</h3>
+          <div class="text-5xl font-bold mb-6">$75,000<span class="text-sm font-normal text-zinc-400">/year</span></div>
+          <ul class="space-y-4 text-sm mb-10">
+            <li class="flex items-center gap-2">✓ Unlimited users</li>
+            <li class="flex items-center gap-2">✓ Air-gapped deployment</li>
+            <li class="flex items-center gap-2">✓ Custom fine-tuning</li>
+            <li class="flex items-center gap-2">✓ Dedicated support</li>
+            <li class="flex items-center gap-2">✓ SLA & audit logs</li>
+          </ul>
+          <a href="#contact" class="block text-center border border-zinc-600 hover:border-white py-3 rounded-2xl text-sm font-medium transition">Contact Sales</a>
+        </div>
+      </div>
+
+      <p class="text-center text-sm text-zinc-500 mt-12">
+        All plans include full data sovereignty and on-prem deployment. Custom enterprise pricing available.
+      </p>
+    </div>
+  </section>
+
+  <!-- Demo -->
+  <section id="demo" class="py-24 bg-black text-center">
+    <div class="max-w-4xl mx-auto px-6">
+      <h2 class="text-4xl font-semibold mb-4">Live Demo</h2>
+      <p class="text-zinc-400">This is a simulated demo. The real version runs privately on your infrastructure with Ollama.</p>
+    </div>
+  </section>
+
+  <footer class="py-12 text-center text-zinc-500 text-sm border-t border-zinc-800">
+    © 2026 Sovereign AI • Self-hosted Intelligence for Regulated Industries
+  </footer>
+
+</body>
 </html>
 
