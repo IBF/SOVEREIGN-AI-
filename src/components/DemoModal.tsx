@@ -1,6 +1,5 @@
-import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
-import { X, Send, CheckCircle2, Loader2 } from "lucide-react";
+import { X, Send } from "lucide-react";
 
 interface DemoModalProps {
   isOpen: boolean;
@@ -8,67 +7,6 @@ interface DemoModalProps {
 }
 
 export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
-  const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
-  const [serverStatus, setServerStatus] = useState<"unknown" | "online" | "offline">("unknown");
-  const [formData, setFormData] = useState({
-    name: "",
-    email: "",
-    company: "",
-    industry: "Finance",
-    message: ""
-  });
-
-  const testConnection = async () => {
-    setServerStatus("unknown");
-    try {
-      const res = await fetch("/ping");
-      if (res.ok) setServerStatus("online");
-      else setServerStatus("offline");
-    } catch (e) {
-      setServerStatus("offline");
-    }
-  };
-
-  useEffect(() => {
-    if (isOpen) {
-      testConnection();
-    }
-  }, [isOpen]);
-
-  const handleSubmit = async (e: FormEvent) => {
-    e.preventDefault();
-    setStatus("submitting");
-
-    try {
-      const response = await fetch("/submit-demo", {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Success:", result);
-        setStatus("success");
-        setTimeout(() => {
-          onClose();
-          setStatus("idle");
-          setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
-        }, 3000);
-      } else {
-        const text = await response.text();
-        throw new Error(`Status ${response.status}: ${text}`);
-      }
-    } catch (error: any) {
-      console.error("Submission Error:", error);
-      alert(`COMMUNICATION ERROR: ${error.message}`);
-      setStatus("idle");
-    }
-  };
-
   return (
     <AnimatePresence>
       {isOpen && (
@@ -87,125 +25,96 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
             exit={{ opacity: 0, scale: 0.9, y: 20 }}
             className="relative w-full max-w-lg glass-dark rounded-[2.5rem] border border-white/10 shadow-2xl overflow-hidden"
           >
-            <div className="absolute top-6 left-8 flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${
-                serverStatus === 'online' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.6)]' : 
-                serverStatus === 'offline' ? 'bg-red-500' : 'bg-slate-500 animate-pulse'
-              }`} />
-              <span className="text-[10px] font-mono uppercase tracking-widest text-slate-500">
-                System: {serverStatus}
-              </span>
-            </div>
-
             <button 
               onClick={onClose}
-              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors"
+              className="absolute top-6 right-6 p-2 text-slate-400 hover:text-white transition-colors z-20"
             >
               <X className="w-6 h-6" />
             </button>
 
             <div className="p-8 md:p-12">
-              {status === "success" ? (
-                <div className="text-center py-12">
-                  <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center mx-auto mb-6"
-                  >
-                    <CheckCircle2 className="w-10 h-10 text-emerald-500" />
-                  </motion.div>
-                  <h3 className="text-2xl font-bold text-white mb-2">Request Received</h3>
-                  <p className="text-slate-400">
-                    Our team will contact you shortly to schedule your private demo.
-                  </p>
+              <h3 className="text-3xl font-bold text-white mb-2">Book Private Demo</h3>
+              <p className="text-slate-400 mb-8">
+                Experience Sovereign AI on your own infrastructure.
+              </p>
+
+              <form 
+                action="https://formspree.io/f/xbdpeezz" 
+                method="POST" 
+                className="space-y-5"
+              >
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Full Name</label>
+                  <input
+                    type="text"
+                    name="name"
+                    required
+                    placeholder="John Doe"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-electric-blue transition placeholder:text-slate-600"
+                  />
                 </div>
-              ) : (
-                <>
-                  <h3 className="text-3xl font-bold text-white mb-2">Book Private Demo</h3>
-                  <p className="text-slate-400 mb-8">
-                    Experience Sovereign AI on your own infrastructure.
-                  </p>
 
-                  <form onSubmit={handleSubmit} className="space-y-4">
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Name</label>
-                        <input
-                          required
-                          type="text"
-                          value={formData.name}
-                          onChange={e => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-electric-blue transition-colors"
-                          placeholder="John Doe"
-                        />
-                      </div>
-                      <div className="space-y-1.5">
-                        <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Company</label>
-                        <input
-                          required
-                          type="text"
-                          value={formData.company}
-                          onChange={e => setFormData({ ...formData, company: e.target.value })}
-                          className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-electric-blue transition-colors"
-                          placeholder="Acme Corp"
-                        />
-                      </div>
-                    </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Business Email</label>
+                  <input
+                    type="email"
+                    name="email"
+                    required
+                    placeholder="john@yourcompany.com"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-electric-blue transition placeholder:text-slate-600"
+                  />
+                </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Work Email</label>
-                      <input
-                        required
-                        type="email"
-                        value={formData.email}
-                        onChange={e => setFormData({ ...formData, email: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-electric-blue transition-colors"
-                        placeholder="john@company.com"
-                      />
-                    </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Company / Firm</label>
+                  <input
+                    type="text"
+                    name="company"
+                    placeholder="Your Law Firm or Company"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-electric-blue transition placeholder:text-slate-600"
+                  />
+                </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Industry</label>
-                      <select
-                        value={formData.industry}
-                        onChange={e => setFormData({ ...formData, industry: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-electric-blue transition-colors appearance-none"
-                      >
-                        <option value="Finance" className="bg-navy-800">Finance</option>
-                        <option value="Healthcare" className="bg-navy-800">Healthcare</option>
-                        <option value="Legal" className="bg-navy-800">Legal</option>
-                        <option value="Government" className="bg-navy-800">Government</option>
-                      </select>
-                    </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Which industry are you in?</label>
+                  <select
+                    name="industry"
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-electric-blue transition appearance-none"
+                  >
+                    <option value="" className="bg-navy-900">Select Industry</option>
+                    <option value="Legal" className="bg-navy-900">Legal</option>
+                    <option value="Finance" className="bg-navy-900">Finance</option>
+                    <option value="Healthcare" className="bg-navy-900">Healthcare</option>
+                    <option value="Other" className="bg-navy-900">Other</option>
+                  </select>
+                </div>
 
-                    <div className="space-y-1.5">
-                      <label className="text-xs font-bold text-slate-500 uppercase tracking-wider">Message</label>
-                      <textarea
-                        rows={3}
-                        value={formData.message}
-                        onChange={e => setFormData({ ...formData, message: e.target.value })}
-                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-electric-blue transition-colors resize-none"
-                        placeholder="Tell us about your requirements..."
-                      />
-                    </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Message / Demo Request</label>
+                  <textarea
+                    name="message"
+                    rows={4}
+                    required
+                    placeholder="I would like a private demo for our team..."
+                    className="w-full bg-white/5 border border-white/10 rounded-2xl px-5 py-3 text-white focus:outline-none focus:border-electric-blue transition resize-none placeholder:text-slate-600"
+                  ></textarea>
+                </div>
 
-                    <button
-                      disabled={status === "submitting"}
-                      type="submit"
-                      className="w-full py-4 bg-electric-blue text-white font-bold rounded-xl hover:bg-electric-blue-light transition-all flex items-center justify-center gap-2 disabled:opacity-50"
-                    >
-                      {status === "submitting" ? (
-                        <Loader2 className="w-5 h-5 animate-spin" />
-                      ) : (
-                        <>
-                          Send Request
-                          <Send className="w-4 h-4" />
-                        </>
-                      )}
-                    </button>
-                  </form>
-                </>
-              )}
+                {/* Hidden field to identify the source */}
+                <input type="hidden" name="_subject" value="New Demo Request from Sovereign AI Website" />
+
+                <button
+                  type="submit"
+                  className="w-full py-4 bg-electric-blue text-white font-bold rounded-2xl hover:bg-electric-blue-light transition-all flex items-center justify-center gap-2 shadow-lg shadow-electric-blue/20 hover:scale-[1.02] active:scale-[0.98]"
+                >
+                  Submit Demo Request
+                  <Send className="w-4 h-4" />
+                </button>
+
+                <p className="text-[10px] text-center text-slate-500 uppercase tracking-widest">
+                  Your information is secure and private.
+                </p>
+              </form>
             </div>
           </motion.div>
         </div>
