@@ -18,14 +18,8 @@ async function startServer() {
 
   // --- API ROUTES ---
   
-  // Health check / Ping
-  app.get("/api/health", (req, res) => {
-    console.log(">>> [API] Health check requested");
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
-  // Main Demo Submission
-  app.post("/api/submit-demo", (req, res) => {
+  // Main Demo Submission - Moved to root level to avoid proxy issues
+  app.post("/submit-demo", (req, res) => {
     try {
       const { name, email, company, industry, message } = req.body;
       
@@ -43,6 +37,12 @@ async function startServer() {
       console.error(">>> [API] Error processing request:", err);
       res.status(500).json({ success: false, message: "Internal Server Error" });
     }
+  });
+
+  // Health check / Ping
+  app.get("/api/health", (req, res) => {
+    console.log(">>> [API] Health check requested");
+    res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
   // Catch-all for other /api routes
