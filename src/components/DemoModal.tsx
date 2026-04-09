@@ -21,14 +21,9 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
   const testConnection = async () => {
     setServerStatus("unknown");
     try {
-      // Try root ping first
       const res = await fetch("/ping");
       if (res.ok) setServerStatus("online");
-      else {
-        const res2 = await fetch("/api/ping");
-        if (res2.ok) setServerStatus("online");
-        else setServerStatus("offline");
-      }
+      else setServerStatus("offline");
     } catch (e) {
       setServerStatus("offline");
     }

@@ -1,4 +1,5 @@
 import express from "express";
+import cors from "cors";
 import { createServer as createViteServer } from "vite";
 import path from "path";
 import { fileURLToPath } from "url";
@@ -8,69 +9,55 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 async function startServer() {
+  console.log(">>> [SERVER] INITIALIZING SOVEREIGN AI BACKEND...");
   const app = express();
   const PORT = 3000;
 
+  app.use(cors());
   app.use(express.json());
-
-  // --- API ROUTES FIRST ---
   
-  // Heartbeat for the frontend status light
+  // Request Logger
+  app.use((req, res, next) => {
+    console.log(`>>> [REQUEST] ${req.method} ${req.url}`);
+    next();
+  });
+
+  // --- API ROUTES ---
+  
   app.get("/ping", (req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
+    console.log(">>> [API] PING RECEIVED");
+    res.status(200).json({ status: "ok", service: "Sovereign AI" });
   });
 
-  // Legacy path support
-  app.get("/api/ping", (req, res) => {
-    res.json({ status: "ok", timestamp: new Date().toISOString() });
-  });
-
-  // Main Demo Submission
   app.post("/submit-demo", (req, res) => {
-    const { name, email, company, industry, message } = req.body;
-    
-    console.log(">>> [SERVER] NEW DEMO REQUEST RECEIVED");
-    console.log(`>>> To: Giuseppe.Santaguida@adexec.com`);
-    console.log(`>>> From: ${name} (${email})`);
-    console.log(`>>> Company: ${company} | Industry: ${industry}`);
-    console.log(`>>> Message: ${message}`);
-    
-    res.status(200).json({ 
-      success: true, 
-      message: "Request successfully logged for Giuseppe.Santaguida@adexec.com" 
-    });
+    const { name, email, company } = req.body;
+    console.log(`>>> [API] DEMO REQUEST: ${name} (${email}) at ${company}`);
+    res.status(200).json({ success: true, message: "Logged" });
   });
 
-  // --- VITE MIDDLEWARE / STATIC SERVING ---
+  // --- FRONTEND ---
 
-  if (process.env.NODE_ENV !== "production") {
+  if (process.env.NODE_ENV === "production") {
+    console.log(">>> [SERVER] RUNNING IN PRODUCTION MODE");
+    const distPath = path.join(process.cwd(), "dist");
+    app.use(express.static(distPath));
+    app.get("*", (req, res) => {
+      res.sendFile(path.join(distPath, "index.html"));
+    });
+  } else {
+    console.log(">>> [SERVER] RUNNING IN DEVELOPMENT MODE (VITE)");
     const vite = await createViteServer({
       server: { middlewareMode: true },
       appType: "spa",
     });
     app.use(vite.middlewares);
-  } else {
-    const distPath = path.join(process.cwd(), "dist");
-    if (fs.existsSync(distPath)) {
-      app.use(express.static(distPath));
-      app.get("*", (req, res) => {
-        res.sendFile(path.join(distPath, "index.html"));
-      });
-    } else {
-      // Fallback to Vite if dist is missing even in production
-      const vite = await createViteServer({
-        server: { middlewareMode: true },
-        appType: "spa",
-      });
-      app.use(vite.middlewares);
-    }
   }
 
   app.listen(PORT, "0.0.0.0", () => {
-    console.log(`>>> Sovereign AI Server running on http://0.0.0.0:${PORT}`);
+    console.log(`>>> [READY] Sovereign AI Server listening on 0.0.0.0:${PORT}`);
   });
 }
 
 startServer().catch(err => {
-  console.error(">>> Failed to start server:", err);
+  console.error(">>> [FATAL] Server failed to start:", err);
 });
