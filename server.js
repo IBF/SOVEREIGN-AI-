@@ -23,28 +23,19 @@ async function startServer() {
   // Debug Ping
   app.get("/api/ping", (req, res) => {
     console.log(">>> [API] Ping received");
-    res.json({ status: "alive", time: new Date().toISOString() });
+    res.json({ status: "alive", time: new Date().toISOString(), env: process.env.NODE_ENV });
   });
 
-  // Main Demo Submission - Root level for maximum reachability
-  app.all("/submit-demo", (req, res) => {
-    console.log(`>>> [API] Request to /submit-demo | Method: ${req.method} | Origin: ${req.get('origin')}`);
+  // Main Demo Submission - Multiple paths for maximum compatibility
+  const handleSubmission = (req, res) => {
+    console.log(`>>> [API] Submission received | Method: ${req.method} | Path: ${req.url}`);
     
-    if (req.method === "GET") {
-      return res.send("Sovereign AI Submission Endpoint is Active. Use POST to submit data.");
-    }
-
-    if (req.method !== "POST") {
-      return res.status(405).json({ error: "Method Not Allowed" });
-    }
-
     try {
-      const { name, email, company, industry, message } = req.body;
+      const { name, email, company } = req.body;
       
       console.log(">>> [SUCCESS] DEMO REQUEST CAPTURED");
       console.log(`>>> To: Giuseppe.Santaguida@adexec.com`);
       console.log(`>>> From: ${name} (${email})`);
-      console.log(`>>> Company: ${company}`);
       console.log("--------------------------------------");
 
       return res.status(200).json({ 
@@ -55,7 +46,15 @@ async function startServer() {
       console.error(">>> [ERROR] Processing submission:", err);
       return res.status(500).json({ success: false, message: "Internal Server Error" });
     }
-  });
+  };
+
+  app.post("/submit-demo", handleSubmission);
+  app.post("/api/submit-demo", handleSubmission);
+  app.post("/api/v1/submit-demo", handleSubmission);
+
+  // GET handlers for debugging
+  app.get("/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
+  app.get("/api/submit-demo", (req, res) => res.send("Endpoint Active (POST required)"));
 
   // --- FRONTEND SERVING ---
 

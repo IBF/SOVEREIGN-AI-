@@ -1,4 +1,4 @@
-import { useState, FormEvent } from "react";
+import { useState, useEffect, FormEvent } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, Send, CheckCircle2, Loader2 } from "lucide-react";
 
@@ -9,6 +9,7 @@ interface DemoModalProps {
 
 export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
   const [status, setStatus] = useState<"idle" | "submitting" | "success">("idle");
+  const [serverStatus, setServerStatus] = useState<"unknown" | "online" | "offline">("unknown");
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -17,50 +18,69 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     message: ""
   });
 
+  const testConnection = async () => {
+    setServerStatus("unknown");
+    try {
+      const res = await fetch("/api/ping");
+      if (res.ok) setServerStatus("online");
+      else setServerStatus("offline");
+    } catch (e) {
+      setServerStatus("offline");
+    }
+  };
+
+  useEffect(() => {
+    if (isOpen) {
+      testConnection();
+    }
+  }, [isOpen]);
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setStatus("submitting");
 
     try {
-      const endpoint = "/submit-demo";
-      console.log(`Attempting POST to: ${endpoint}`);
-      
-      const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify(formData)
-      });
+      // Try multiple endpoints in sequence if one fails
+      const endpoints = ["/submit-demo", "/api/submit-demo"];
+      let lastError = null;
 
-      console.log("Response received. Status:", response.status);
-
-      if (response.ok) {
-        const result = await response.json();
-        console.log("Success:", result);
-        setStatus("success");
-        setTimeout(() => {
-          onClose();
-          setStatus("idle");
-          setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
-        }, 3000);
-      } else {
-        // Try to get JSON error, fallback to text
-        let errorMessage = "Unknown Error";
+      for (const endpoint of endpoints) {
         try {
-          const errorData = await response.json();
-          errorMessage = errorData.message || JSON.stringify(errorData);
-        } catch (e) {
-          errorMessage = await response.text();
+          console.log(`Attempting submission to: ${endpoint}`);
+          const response = await fetch(endpoint, {
+            method: "POST",
+            headers: { 
+              "Content-Type": "application/json",
+              "Accept": "application/json"
+            },
+            body: JSON.stringify(formData)
+          });
+
+          if (response.ok) {
+            const result = await response.json();
+            console.log("Success:", result);
+            setStatus("success");
+            setTimeout(() => {
+              onClose();
+              setStatus("idle");
+              setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
+            }, 3000);
+            return; // Exit on success
+          } else {
+            const text = await response.text();
+            console.warn(`Endpoint ${endpoint} failed with status ${response.status}: ${text}`);
+            lastError = `[${endpoint}] Status ${response.status}: ${text}`;
+          }
+        } catch (err: any) {
+          console.error(`Fetch error for ${endpoint}:`, err);
+          lastError = err.message;
         }
-        
-        console.error("Server Error:", response.status, errorMessage);
-        throw new Error(`[Status ${response.status}] ${errorMessage.substring(0, 100)}`);
       }
+      
+      throw new Error(lastError || "All endpoints failed");
     } catch (error: any) {
-      console.error("Fetch Error:", error);
-      alert(`SOVEREIGN AI SAY THAT SOMETHING WENT WRONG: ${error.message}`);
+      console.error("Final Submission Error:", error);
+      alert(`SOVEREIGN AI COMMUNICATION ERROR: ${error.message}`);
       setStatus("idle");
     }
   };
