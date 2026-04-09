@@ -48,7 +48,11 @@ const tiers = [
   }
 ];
 
-export default function Pricing() {
+interface PricingProps {
+  onOpenDemo: () => void;
+}
+
+export default function Pricing({ onOpenDemo }: PricingProps) {
   return (
     <section id="pricing" className="py-32 px-6">
       <div className="max-w-7xl mx-auto">
@@ -99,7 +103,9 @@ export default function Pricing() {
                 ))}
               </div>
 
-              <button className={`w-full py-4 rounded-2xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] ${
+              <button 
+                onClick={onOpenDemo}
+                className={`w-full py-4 rounded-2xl font-bold transition-all hover:scale-[1.02] active:scale-[0.98] ${
                 tier.highlighted 
                   ? "bg-electric-blue text-white shadow-lg shadow-electric-blue/20" 
                   : "bg-white/5 text-white border border-white/10 hover:bg-white/10"

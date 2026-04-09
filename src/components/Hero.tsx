@@ -1,7 +1,19 @@
 import { motion } from "motion/react";
 import { ChevronRight, ShieldCheck } from "lucide-react";
+import PremiumVideo from "./PremiumVideo";
 
-export default function Hero() {
+interface HeroProps {
+  onOpenDemo: () => void;
+}
+
+export default function Hero({ onOpenDemo }: HeroProps) {
+  const scrollTo = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section className="relative min-h-screen flex flex-col items-center justify-center px-6 pt-20 overflow-hidden">
       {/* Animated Background Elements */}
@@ -54,17 +66,23 @@ export default function Hero() {
           transition={{ duration: 0.8, delay: 0.8 }}
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
         >
-          <button className="w-full sm:w-auto px-8 py-4 bg-white text-navy-900 font-bold rounded-full hover:bg-slate-200 transition-all hover:scale-105 active:scale-95">
+          <button 
+            onClick={onOpenDemo}
+            className="w-full sm:w-auto px-8 py-4 bg-white text-navy-900 font-bold rounded-full hover:bg-slate-200 transition-all hover:scale-105 active:scale-95"
+          >
             Book Private Demo
           </button>
-          <button className="w-full sm:w-auto px-8 py-4 bg-white/5 text-white font-bold rounded-full border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 group">
-            View Architecture
+          <button 
+            onClick={() => scrollTo("demo")}
+            className="w-full sm:w-auto px-8 py-4 bg-white/5 text-white font-bold rounded-full border border-white/10 hover:bg-white/10 transition-all flex items-center justify-center gap-2 group"
+          >
+            Try Live Demo
             <ChevronRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </button>
         </motion.div>
       </div>
 
-      {/* Hero Image/Graphic Placeholder */}
+      {/* Hero Video Section */}
       <motion.div
         initial={{ opacity: 0, scale: 0.9, y: 100 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -72,18 +90,7 @@ export default function Hero() {
         className="mt-24 relative w-full max-w-6xl mx-auto"
       >
         <div className="aspect-[21/9] rounded-3xl overflow-hidden glass border border-white/10 shadow-2xl relative">
-          <div className="absolute inset-0 bg-gradient-to-t from-navy-900 via-transparent to-transparent z-10" />
-          <img 
-            src="https://picsum.photos/seed/sovereign/1600/800" 
-            alt="Sovereign AI Dashboard" 
-            className="w-full h-full object-cover opacity-60"
-            referrerPolicy="no-referrer"
-          />
-          <div className="absolute inset-0 flex items-center justify-center z-20">
-            <div className="w-20 h-20 rounded-full bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center cursor-pointer hover:scale-110 transition-transform">
-              <div className="w-0 h-0 border-t-[10px] border-t-transparent border-l-[18px] border-l-white border-b-[10px] border-b-transparent ml-1" />
-            </div>
-          </div>
+          <PremiumVideo />
         </div>
       </motion.div>
     </section>

@@ -1,12 +1,19 @@
 import { Shield, Twitter, Github, Linkedin } from "lucide-react";
 
 export default function Footer() {
+  const scrollTo = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <footer className="py-20 px-6 border-t border-white/5 bg-navy-900">
       <div className="max-w-7xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
           <div className="md:col-span-1">
-            <div className="flex items-center gap-2 mb-6">
+            <div className="flex items-center gap-2 mb-6 cursor-pointer" onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}>
               <Shield className="w-6 h-6 text-electric-blue" />
               <span className="text-xl font-semibold text-white">Sovereign AI</span>
             </div>
@@ -25,10 +32,10 @@ export default function Footer() {
           <div>
             <h4 className="text-white font-bold mb-6">Product</h4>
             <ul className="space-y-4 text-sm text-slate-500">
-              <li><a href="#" className="hover:text-white transition-colors">Architecture</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Security</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Verticals</a></li>
-              <li><a href="#" className="hover:text-white transition-colors">Pricing</a></li>
+              <li><button onClick={() => scrollTo("features")} className="hover:text-white transition-colors">Architecture</button></li>
+              <li><button onClick={() => scrollTo("demo")} className="hover:text-white transition-colors">Security</button></li>
+              <li><button onClick={() => scrollTo("verticals")} className="hover:text-white transition-colors">Verticals</button></li>
+              <li><button onClick={() => scrollTo("pricing")} className="hover:text-white transition-colors">Pricing</button></li>
             </ul>
           </div>
 
