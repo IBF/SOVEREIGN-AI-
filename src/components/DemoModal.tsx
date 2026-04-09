@@ -22,9 +22,10 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
     setStatus("submitting");
 
     try {
-      console.log("Initiating fetch to /api/demo-request...");
-      // Use absolute URL to ensure it hits the correct backend port in this environment
-      const response = await fetch(`${window.location.origin}/api/demo-request`, {
+      const endpoint = "/api/v1/demo";
+      console.log(`Attempting POST to: ${endpoint}`);
+      
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { 
           "Content-Type": "application/json",
@@ -33,11 +34,11 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
         body: JSON.stringify(formData)
       });
 
-      console.log("Response status:", response.status);
+      console.log("Response received. Status:", response.status);
 
       if (response.ok) {
         const result = await response.json();
-        console.log("Request successful:", result);
+        console.log("Success:", result);
         setStatus("success");
         setTimeout(() => {
           onClose();
@@ -45,12 +46,20 @@ export default function DemoModal({ isOpen, onClose }: DemoModalProps) {
           setFormData({ name: "", email: "", company: "", industry: "Finance", message: "" });
         }, 3000);
       } else {
-        const errorData = await response.json().catch(() => ({ message: "Unknown server error" }));
-        console.error("Request failed:", response.status, errorData);
-        throw new Error(`Server returned ${response.status}: ${errorData.message || 'No details'}`);
+        // Try to get JSON error, fallback to text
+        let errorMessage = "Unknown Error";
+        try {
+          const errorData = await response.json();
+          errorMessage = errorData.message || JSON.stringify(errorData);
+        } catch (e) {
+          errorMessage = await response.text();
+        }
+        
+        console.error("Server Error:", response.status, errorMessage);
+        throw new Error(`[Status ${response.status}] ${errorMessage.substring(0, 100)}`);
       }
     } catch (error: any) {
-      console.error("Detailed Error:", error);
+      console.error("Fetch Error:", error);
       alert(`SOVEREIGN AI SAY THAT SOMETHING WENT WRONG: ${error.message}`);
       setStatus("idle");
     }

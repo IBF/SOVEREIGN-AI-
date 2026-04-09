@@ -14,28 +14,34 @@ async function startServer() {
   app.use(cors());
   app.use(express.json());
 
+  // Global Logger
+  app.use((req, res, next) => {
+    console.log(`>>> [${new Date().toISOString()}] ${req.method} ${req.url}`);
+    next();
+  });
+
   // Health check
   app.get("/api/health", (req, res) => {
     res.json({ status: "ok", timestamp: new Date().toISOString() });
   });
 
-  // API Route for Demo Request
-  app.post("/api/demo-request", (req, res) => {
+  // API Route for Demo Request - Using v1 prefix for clarity
+  app.all("/api/v1/demo", (req, res) => {
+    if (req.method !== "POST") {
+      return res.status(405).json({ success: false, message: "Method Not Allowed" });
+    }
+
     try {
       const { name, email, company, industry, message } = req.body;
       
-      console.log("--- NEW DEMO REQUEST RECEIVED ---");
-      console.log(`Timestamp: ${new Date().toISOString()}`);
+      console.log("--- NEW DEMO REQUEST RECEIVED (v1) ---");
       console.log(`To: Giuseppe.Santaguida@adexec.com`);
       console.log(`From: ${name} <${email}>`);
-      console.log(`Company: ${company}`);
-      console.log(`Industry: ${industry}`);
-      console.log(`Message: ${message}`);
-      console.log("---------------------------------");
+      console.log("--------------------------------------");
 
       res.status(200).json({ 
         success: true, 
-        message: "Request received and logged for Giuseppe.Santaguida@adexec.com" 
+        message: "Request received for Giuseppe.Santaguida@adexec.com" 
       });
     } catch (error: any) {
       console.error("API Route Error:", error);
@@ -45,11 +51,11 @@ async function startServer() {
 
   // 404 Debugger for API
   app.use("/api/*", (req, res) => {
-    console.warn(`404 at ${req.originalUrl} [${req.method}]`);
+    console.warn(`!!! API 404: ${req.method} ${req.originalUrl}`);
     res.status(404).json({ 
       success: false, 
-      message: `API Route ${req.originalUrl} not found`,
-      availableRoutes: ["/api/health", "/api/demo-request"]
+      message: `Endpoint ${req.originalUrl} not found on this server`,
+      validEndpoints: ["/api/health", "/api/v1/demo"]
     });
   });
 
