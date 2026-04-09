@@ -4,16 +4,44 @@ import { Play, Shield, RefreshCw } from "lucide-react";
 
 const explanationSlides = [
   {
-    text: "Sovereign Intelligence.",
-    sub: "The pinnacle of private AI infrastructure."
+    text: "Zero Token Fees",
+    sub: "Pay once per year. Use the AI as much as you want. No surprise bills."
   },
   {
-    text: "Air-Gapped Mastery.",
-    sub: "Absolute isolation. Zero external dependencies."
+    text: "Complete Data Sovereignty",
+    sub: "All processing happens on your infrastructure. Data never leaves your company."
   },
   {
-    text: "Your City. Your Rules.",
-    sub: "Deploy intelligence exactly where you need it."
+    text: "Predictable Cost",
+    sub: "Fixed annual license instead of unpredictable per-token cloud pricing."
+  },
+  {
+    text: "True Air-Gapped Ready",
+    sub: "Works offline in secure environments with no external dependencies."
+  },
+  {
+    text: "Built for Regulated Industries",
+    sub: "Designed for HIPAA, SOX, and PCI-DSS compliance from the ground up."
+  },
+  {
+    text: "No Vendor Lock-in",
+    sub: "You own the system. Run it forever without relying on any cloud provider."
+  },
+  {
+    text: "Enterprise-Grade Privacy",
+    sub: "Full audit logs, differential privacy, and on-prem deployment."
+  },
+  {
+    text: "Pay once. Use unlimited.",
+    sub: "Own everything. Stop paying for every prompt."
+  },
+  {
+    text: "Your data. Your AI. Your rules.",
+    sub: "Compliance without compromise."
+  },
+  {
+    text: "The AI that never phones home.",
+    sub: "Fixed cost. Unlimited intelligence."
   }
 ];
 
@@ -58,6 +86,7 @@ export default function PremiumVideo() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isEnded, setIsEnded] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
 
   const startVideo = () => {
     setIsPlaying(true);
@@ -66,6 +95,11 @@ export default function PremiumVideo() {
     if (videoRef.current) {
       videoRef.current.currentTime = 0;
       videoRef.current.play();
+    }
+    if (audioRef.current) {
+      audioRef.current.currentTime = 0;
+      audioRef.current.volume = 0.4;
+      audioRef.current.play();
     }
   };
 
@@ -77,11 +111,23 @@ export default function PremiumVideo() {
             return prev + 1;
           } else {
             clearInterval(interval);
-            setTimeout(() => setIsEnded(true), 2000);
+            setTimeout(() => {
+              setIsEnded(true);
+              if (audioRef.current) {
+                // Fade out audio slightly at the end
+                const fadeOut = setInterval(() => {
+                  if (audioRef.current && audioRef.current.volume > 0.05) {
+                    audioRef.current.volume -= 0.05;
+                  } else {
+                    clearInterval(fadeOut);
+                  }
+                }, 100);
+              }
+            }, 2000);
             return prev;
           }
         });
-      }, 4000);
+      }, 3500); // Slightly faster transitions for more content
       return () => clearInterval(interval);
     }
   }, [isPlaying, isEnded]);
@@ -104,6 +150,13 @@ export default function PremiumVideo() {
           isPlaying ? "scale-110 blur-[2px] brightness-[0.3]" : "scale-100 brightness-50"
         }`}
         src="https://cdn.pixabay.com/video/2021/09/01/87061-600329482_large.mp4"
+      />
+
+      {/* Background Music */}
+      <audio 
+        ref={audioRef}
+        src="https://assets.mixkit.co/music/preview/mixkit-delicate-ambient-111.mp3"
+        loop
       />
 
       {/* Digital Character Layer */}
